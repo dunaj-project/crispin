@@ -55,6 +55,19 @@ No official release yet.
 
 Depends on Dunaj.
 
+Available functions:
+
+* cfg - does all the magic mentioned above and returns ordinary immutable map
+
+Utility functions:
+
+* sget
+* bget
+* nget
+* sget-in
+* bget-in
+* nget-in
+
 == License
 
 Copyright © 2015, Jozef Wagner.
