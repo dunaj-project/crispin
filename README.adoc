@@ -11,11 +11,49 @@ don’t know where y’left ‘em.
 
 Crispin is a Dunaj library for managing project wide configuration.
 
-TODO
+Configuration map is assumed immutable and can be safely cached.
+Configuration is static. When the config changes, service should be
+restarted. Design choice is to have stateless fail-fast services,
+that have their configuration stored on various places.
+
+Main feature is to provides map merged from various sources, in following order:
+
+* Configuration file in the root classpath
+* Configuration files within classpath starting from user
+  defined namespace
+* Project specific environment variables
+  (set e.g. in lein project.clj or profiles.clj)
+  Users must use `lein-environ` plugin to enable this
+* Environment variables, translating keys
+* Java system properties, translating keys
+* Custom configuration resources pointed from [:crispin]
+  property, guessing format from filename, defaulting to .edn
+
+All data is merged into one map and keys are translated to the
+hierarchy of keyword. This will either be perfect to your project
+or is not useful at all.
+
+Accepted file names for configuration files, loaded in following
+order:
+
+* config.json
+* config.edn
+* config.clj
+
+Supports fetching external resources with #resorce "url" format.
+
+Conflicts when merging branch and non-branch nodes are resolved
+into creation of branch node with previous non-branch node put
+under nil key.
+
+Accepts map with types that parses values into desired format,
+such as integer, keyword, vector, etc.
 
 == Usage
 
-TODO
+No official release yet.
+
+Depends on Dunaj.
 
 == License
 
