@@ -51,7 +51,7 @@ such as integer, keyword, vector, etc.
 
 == Usage
 
-No official release yet.
+In Lein, `[crispin "0.1.0"]`
 
 Depends on Dunaj.
 
