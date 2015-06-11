@@ -30,8 +30,8 @@ Main feature is to provides map merged from various sources, in following order:
   property, guessing format from filename, defaulting to .edn
 
 All data is merged into one map and keys are translated to the
-hierarchy of keyword. This will either be perfect to your project
-or is not useful at all.
+hierarchy of keywords. This will either be perfect to your project
+or not useful at all.
 
 Accepted file names for configuration files, loaded in following
 order:
