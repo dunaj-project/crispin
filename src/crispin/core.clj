@@ -116,13 +116,14 @@
   produce exactly one parsed value.
   Returns `nil` if resource does not exists"
   ([uri :- Any]
-   (let [s (->str (or (:uri uri) uri))
-         u (du/uri s)
-         s (or (get u :path) (get u :scheme-specific-part))
-         i (or (last-index-of s \.) -1)
-         ext (section s (inc i))
-         p (condp = ext "json" kjson "edn" edn "clj" clj edn)]
-     (fetch-resource p uri)))
+   (when-not (map? uri) ;; special case for [:crispin] custom res
+     (let [s (->str (or (:uri uri) uri))
+           u (du/uri s)
+           s (or (get u :path) (get u :scheme-specific-part))
+           i (or (last-index-of s \.) -1)
+           ext (section s (inc i))
+           p (condp = ext "json" kjson "edn" edn "clj" clj edn)]
+       (fetch-resource p uri))))
   ([parser :- IParserFactory, uri :- Any]
    (when uri
      (try
@@ -211,13 +212,11 @@
 
 (defn instance?*
   [t m]
-  (if (protocol? t)
-    (satisfies? t m)
-    (let [t (if (class? t)
-              t
-              (or (:on-class t)
-                  (eval (clojure.bootstrap/type-hint t))))]
-      (or (nil? t) (instance? t m)))))
+  (cond (protocol? t) (satisfies? t m)
+        (class? t) t
+        :let [c (or (:on-class t)
+                    (eval (clojure.bootstrap/type-hint t)))]
+        (or (nil? t) (instance? t m))))
 
 (def bmap {"true" true "false" false
            "t" true "f" false
