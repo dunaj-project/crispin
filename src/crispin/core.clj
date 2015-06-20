@@ -29,7 +29,8 @@
    [dunaj.resource :refer [IAcquirableFactory]]
    [dunaj.uri :as du]
    [clojure.java.io :as jio]
-   [dunaj.format :refer [IParserFactory]]))
+   [dunaj.format :refer [IParserFactory]]
+   [dunaj.type.validation :refer [validate-value]]))
 
 (warn-on-reflection!)
 
@@ -248,8 +249,33 @@
         b)
       (string? m) (recur (parse-whole clj m) t)
       (or (nil? m) (instance?* t m)) m
+      ;; TODO: use validate value if else fails
       (throw (illegal-argument (->str m " should be of type " t))))))
 
+(defn cast-fn
+  [s v]
+  (let [try-string
+        #(try
+           (cond (string? %) % (canonical? %) (canonical %) (->str %))
+           (catch java.lang.Exception e nil))
+        try-number
+        #(try
+           (cond
+             (number? %) %
+             (let [pv (parse-whole edn %)] (when (number? pv) pv)))
+           (catch java.lang.Exception e nil))
+        try-bool
+        #(try
+           (get bmap (lower-case %))
+           (catch java.lang.Exception e nil))        
+        ts (try-string v)]
+    (cond (and ts (validate-value type ts)) ts
+          :let [tn (try-number v)]
+          (and tn (validate-value type tn)) tn          
+          :let [tb (try-bool v)]
+          (and (not (nil? tb)) (validate-value type tb)) tb          
+          (throw (illegal-argument
+                  "cannot validate value from configuration")))))
 
 ;;;; Public API
 
@@ -282,7 +308,9 @@
   under nil key.
 
   Transforms properties into nested map, based on specific
-  configuration format."
+  configuration format.
+
+  Returned map attaches casting function under :cast-fn metadata."
   {:added "1.0"}
   ([]
    (cfg nil nil false))
@@ -311,7 +339,7 @@
          res (apply merge-cfg res)
          res (merge-cfg (assoc-in m [:raw :res] res) res)
          res (if include-raw? res (dissoc res :raw))]
-     (parse-type res type))))
+     (update-meta (parse-type res type) assoc :cast-fn cast-fn))))
 
 (defn nget-in :- (Maybe Number)
   "Like get-in, but parses value with edn reader and asserts that
