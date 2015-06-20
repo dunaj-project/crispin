@@ -253,7 +253,7 @@
       (throw (illegal-argument (->str m " should be of type " t))))))
 
 (defn cast-fn
-  [s v]
+  [type v]
   (let [try-string
         #(try
            (cond (string? %) % (canonical? %) (canonical %) (->str %))
@@ -267,13 +267,13 @@
         try-bool
         #(try
            (get bmap (lower-case %))
-           (catch java.lang.Exception e nil))        
+           (catch java.lang.Exception e nil))
         ts (try-string v)]
     (cond (and ts (validate-value type ts)) ts
           :let [tn (try-number v)]
-          (and tn (validate-value type tn)) tn          
+          (and tn (validate-value type tn)) tn
           :let [tb (try-bool v)]
-          (and (not (nil? tb)) (validate-value type tb)) tb          
+          (and (not (nil? tb)) (validate-value type tb)) tb
           (throw (illegal-argument
                   "cannot validate value from configuration")))))
 
