@@ -9,7 +9,8 @@ don’t know where y’left ‘em.
 
 == Overview
 
-Crispin is a Dunaj library for managing project wide configuration.
+Crispin is a library for managing project wide configuration.
+An optimized version of this library for Dunaj can be found in `Dunaj` branch of this project.
 
 Configuration map is assumed immutable and can be safely cached.
 Configuration is static. When the config changes, service should be
@@ -40,7 +41,7 @@ order:
 * config.edn
 * config.clj
 
-Supports fetching external resources with #resorce "url" format.
+Supports fetching external resources with #crispin.core/resorce "url" format.
 
 Conflicts when merging branch and non-branch nodes are resolved
 into creation of branch node with previous non-branch node put
@@ -51,9 +52,7 @@ such as integer, keyword, vector, etc.
 
 == Usage
 
-In Lein, `[crispin "0.2.0"]`
-
-Depends on Dunaj.
+In Lein, `[crispin "0.3.0"]`
 
 Available functions:
 
