@@ -271,12 +271,10 @@
   under nil key."
   {:added "1.0"}
   ([]
-   (cfg nil nil false))
+   (cfg nil false))
   ([search-in]
-   (cfg search-in nil false))
-  ([search-in type]
-   (cfg search-in type false))
-  ([search-in type include-raw?]
+   (cfg search-in false))
+  ([search-in include-raw?]
    (let [env-map (fetch-env)
          sys-map (fetch-sys)
          custom (provide-sequential search-in)
