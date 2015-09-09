@@ -8,5 +8,6 @@
   :scm {:name "git" :url "https://github.com/dunaj-project/crispin"}
   :signing {:gpg-key "6A72CBE2"}
   :deploy-repositories [["clojars" {:creds :gpg}]]
-  :dependencies [[cheshire "5.5.0"]]
+  :dependencies [[cheshire "5.5.0"]
+                 [org.clojure/clojure "1.7.0"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.7.0"]]}})
