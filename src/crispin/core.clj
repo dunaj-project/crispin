@@ -238,9 +238,9 @@
 
 ;;;; Public API
 
-(def custom-cfg
+(def ^{:added "1.0"} custom-cfg
   "A reference to map that will be merged into configuration
-  map. Used by e.g. boot to inject custom configuration."
+  map. Used e.g. by boot to inject custom configuration."
   (atom {}))
 
 (defn cfg
@@ -290,6 +290,7 @@
          exf #(if (satisfies? IResource %) (fetch-resource (-get-uri %)) %)
          m (merge-cfg (cw/prewalk exf (:cp raw))
                       (cw/prewalk exf (:profile raw))
+                      (cw/prewalk exf @custom-cfg)
                       (:env raw) (:sys raw) {:raw raw})
          res (->> (get-in m [:crispin] nil)
                   provide-sequential
