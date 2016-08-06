@@ -1,4 +1,4 @@
-(defproject crispin "0.3.1-SNAPSHOT"
+(defproject crispin "0.3.1"
   :description "A library for managing project-wide configuration."
   :url "https://github.com/dunaj-project/crispin"
   :license {:name "Eclipse Public License"
@@ -8,6 +8,6 @@
   :scm {:name "git" :url "https://github.com/dunaj-project/crispin"}
   :signing {:gpg-key "487FA463"}
   :deploy-repositories [["clojars" {:creds :gpg}]]
-  :dependencies [[cheshire "5.6.1"]
+  :dependencies [[cheshire "5.6.3"]
                  [org.clojure/clojure "1.8.0"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.8.0"]]}})

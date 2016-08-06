@@ -27,6 +27,18 @@
 
 (set! *warn-on-reflection* true)
 
+(def preescape-map
+  {"__DASH__" "~~CRISPIN~DASH~~"
+   "__UNDERSCORE__" "~~CRISPIN~UNDERSCORE~~"
+   "__DOT__" "~~CRISPIN~DOT~~"
+   #"__U(\p{XDigit}{4})__" "~~CRISPIN~$1~~"})
+
+(def escape-map
+  {"~~CRISPIN~DASH~~" "_"
+   "~~CRISPIN~UNDERSCORE~~" "_"
+   "~~CRISPIN~DOT~~" "."
+   #"~~CRISPIN~(\p{XDigit}{4})~~"
+   #(-> % second (Long/parseLong 16) char str)})
 
 ;; taken from clojure.java.classpath, Copyright by Stuart Sierra
 (defn ^Boolean jar-file?
@@ -78,17 +90,29 @@
                   :else %2)]
     (apply merge-with mf maps)))
 
-(defn ^:private transform-keys
+(defn unescape
+  [s m]
+  (let [rf (fn [s [f t]] (cs/replace s f t))]
+    (reduce rf s m)))
+
+(defn transform-keys
   [coll separator]
-  (let [tf #(vec (map keyword (cs/split (cs/lower-case %)
-                                        separator)))
+  (let [sf #(-> %
+                (unescape preescape-map)
+                (cs/split separator))
+        cf (comp keyword
+                 cs/lower-case
+                 #(unescape % escape-map))
+        tf (fn [k] (->> (sf k)
+                        (map cf)
+                        vec))
         rf (fn [m [k v]] (merge-cfg m (assoc-in {} (tf k) v)))]
     (reduce rf {} (seq coll))))
 
 (defn fetch-env
   "Returns map that represents current environment variables.
   Name of the environment variable is translated into sequence
-  of keys, e.g. JAVA_HOME will result into 
+  of keys, e.g. JAVA_HOME will result into
   {:java {:home \"/usr/lib/...\"}} map"
   []
   (transform-keys (java.lang.System/getenv) #"_"))
@@ -96,7 +120,7 @@
 (defn fetch-sys
   "Returns map that represents current system properties
   Name of the environment variable is translated into sequence
-  of keys, e.g. java.home will result into 
+  of keys, e.g. java.home will result into
   {:java {:home \"/usr/lib/...\"}} map"
   []
   (transform-keys (java.lang.System/getProperties) #"\."))
@@ -285,7 +309,9 @@
               :env env-map
               :profile profile-map
               :sys sys-map}
-         exf #(if (satisfies? IResource %) (fetch-resource (-get-uri %)) %)
+         exf #(if (satisfies? IResource %)
+                (fetch-resource (-get-uri %))
+                %)
          m (merge-cfg (cw/prewalk exf (:cp raw))
                       (cw/prewalk exf (:profile raw))
                       (cw/prewalk exf @custom-cfg)
@@ -310,9 +336,10 @@
        (cond
          (identical? v default-value) v
          (number? v) v
-         :else (let [pv (ce/read-string v)] 
+         :else (let [pv (ce/read-string v)]
                  (when-not (number? pv)
-                   (throw (IllegalArgumentException. "cannot parse to number")))
+                   (throw (IllegalArgumentException.
+                           "cannot parse to number")))
                  pv))))))
 
 (defn sget-in
@@ -340,7 +367,8 @@
    (if-let [s (sget-in cfg ks nil)]
      (let [r (get bmap (cs/lower-case s))]
        (cond
-         (nil? r) (throw (IllegalArgumentException. "value not recognized"))
+         (nil? r) (throw (IllegalArgumentException.
+                          "value not recognized"))
          (identical? :default r) default-value
          :else r)))))
 
