@@ -34,7 +34,7 @@
    #"__U(\p{XDigit}{4})__" "~~CRISPIN~$1~~"})
 
 (def escape-map
-  {"~~CRISPIN~DASH~~" "_"
+  {"~~CRISPIN~DASH~~" "-"
    "~~CRISPIN~UNDERSCORE~~" "_"
    "~~CRISPIN~DOT~~" "."
    #"~~CRISPIN~(\p{XDigit}{4})~~"
