@@ -1,4 +1,4 @@
-(defproject crispin "0.3.4-SNAPSHOT"
+(defproject crispin "0.3.5-SNAPSHOT"
   :description "A library for managing project-wide configuration."
   :url "https://github.com/dunaj-project/crispin"
   :license {:name "Eclipse Public License"

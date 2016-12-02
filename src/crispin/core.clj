@@ -353,7 +353,7 @@
          v (get-in cfg ks default-value)]
      (cond (identical? v default-value) v
            (nil? v) v
-           (string? v)
+           (string? v) v
            :else (str v)))))
 
 (defn bget-in
