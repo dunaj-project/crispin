@@ -344,18 +344,17 @@
 
 (defn sget-in
   "Like get-in, but coerces to string. Does not parse default value.
-  Allows nil values."
+  Nil is not coerced into a string."
   {:added "1.0"}
   ([cfg ks]
    (sget-in cfg ks nil))
   ([cfg ks default-value]
-   (let [ks (if (vector? ks) ks (vector ks))]
-     (when-let [v (get-in cfg ks default-value)]
-       (cond (identical? v default-value) v
-             (nil? v) v
-             (string? v) v
- ;;            (canonical? v) (canonical v)
-             :else (str v))))))
+   (let [ks (if (vector? ks) ks (vector ks))
+         v (get-in cfg ks default-value)]
+     (cond (identical? v default-value) v
+           (nil? v) v
+           (string? v)
+           :else (str v)))))
 
 (defn bget-in
   "Like get-in, but coerces to boolean. Does not parse default value.
