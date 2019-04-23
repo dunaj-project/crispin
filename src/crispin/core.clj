@@ -1,4 +1,4 @@
-;; Copyright (C) 2015, Jozef Wagner. All rights reserved.
+;; Copyright (C) 2015, 2019, Jozef Wagner. All rights reserved.
 ;;
 ;; The use and distribution terms for this software are covered by the
 ;; Eclipse Public License 1.0
@@ -23,7 +23,8 @@
    [clojure.string :as cs]
    [clojure.walk :as cw]
    [clojure.edn :as ce]
-   [cheshire.core :as cc]))
+   [cheshire.core :as cc]
+   [clojure.string :as str]))
 
 (set! *warn-on-reflection* true)
 
@@ -57,30 +58,6 @@
   (->> (enumeration-seq (.entries jar-file))
        (filter #(not (.isDirectory ^java.util.jar.JarEntry %)))
        (map #(.getName ^java.util.jar.JarEntry %))))
-
-;; taken from clojure.java.classpath, Copyright by Stuart Sierra
-(defprotocol URLClasspath
-  (-urls [loader]
-    "Returns a sequence of java.net.URL objects representing locations
-    which this classloader will search for classes and resources."))
-
-;; taken from clojure.java.classpath, Copyright by Stuart Sierra
-(extend-type java.net.URLClassLoader
-  URLClasspath
-  (-urls [loader] (seq (.getURLs loader))))
-
-;; taken from clojure.java.classpath, Copyright by Stuart Sierra
-(defn xclasspath
-  "Returns a sequence of File objects of the elements on the
-  classpath."
-  ([]
-   (xclasspath (clojure.lang.RT/baseLoader)))
-  ([classloader]
-   (->> classloader
-        (iterate #(.getParent ^java.lang.ClassLoader %))
-        (take-while identity)
-        (mapcat #(map jio/as-file (-urls %)))
-        distinct)))
 
 (defn merge-cfg
   [& maps]
@@ -213,23 +190,6 @@
   [x]
   (cond (nil? x) [] (sequential? x) x :else [x]))
 
-(defn find-on-cp
-  ([find-in]
-   (find-on-cp find-in find-in))
-  ([prefix find-in]
-   (let [find-in (map name (provide-sequential find-in))
-         ppath (java.nio.file.Paths/get
-                (first find-in)
-                (into-array java.lang.String (rest find-in)))
-         spath (.toString ppath)
-         ff #(or (not (jar-file? %))
-                 (.getJarEntry
-                  (java.util.jar.JarFile. ^java.io.File %) spath))
-         cpl (filter ff (reverse (xclasspath)))
-         mf #(when (.exists ^java.io.File %) (fetch-cp-entry % ppath))
-         m (apply merge-cfg (map mf cpl))]
-     (assoc-in {} (provide-sequential prefix) m))))
-
 (defn fetch-root
   []
   (merge-cfg (fetch-resource "cp:config.edn")
@@ -271,8 +231,6 @@
   "Provides map merged from various sources, in following order:
 
   * :cp Configuration file in the root classpath
-  * :cp Configuration files within classpath starting from user
-    defined namespace
   * :profile Project specific environment variables
     (set e.g. in lein project.clj or profiles.clj)
     Users must use lein-environ plugin to enable this
@@ -301,11 +259,9 @@
   ([search-in include-raw?]
    (let [env-map (fetch-env)
          sys-map (fetch-sys)
-         custom (provide-sequential search-in)
-         custom-map (when-not (empty? custom) (find-on-cp custom))
          root-map (fetch-root)
          profile-map (fetch-resource :clj ".lein-env")
-         raw {:cp (merge-cfg root-map custom-map)
+         raw {:cp root-map
               :env env-map
               :profile profile-map
               :sys sys-map}

@@ -20,8 +20,6 @@ that have their configuration stored on various places.
 Main feature is to provides map merged from various sources, in following order:
 
 * Configuration file in the root classpath
-* Configuration files within classpath starting from user
-  defined namespace
 * Project specific environment variables
   (set e.g. in lein project.clj or profiles.clj)
   Users must use `lein-environ` plugin to enable this
@@ -69,7 +67,7 @@ Utility functions:
 
 == License
 
-Copyright © 2015, Jozef Wagner.
+Copyright © 2015, 2019, Jozef Wagner.
 
 The use and distribution terms for this software are covered by the [Eclipse Public License 1.0](http://opensource.org/licenses/eclipse-1.0.php) which can be found in the file epl-v10.html at the root of this distribution.
 
