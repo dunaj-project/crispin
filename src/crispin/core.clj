@@ -192,7 +192,7 @@
 
 (defn fetch-root
   []
-  (merge-cfg (fetch-resource "cp:config.edn")
+  (merge-cfg (fetch-resource "cp:config.json")
              (fetch-resource "cp:config.edn")
              (fetch-resource "cp:config.clj")))
 
