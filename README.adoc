@@ -50,7 +50,7 @@ such as integer, keyword, vector, etc.
 
 == Usage
 
-In Lein, `[crispin "0.3.7"]`
+In Lein, `[crispin "0.3.8"]`
 
 Available functions:
 
