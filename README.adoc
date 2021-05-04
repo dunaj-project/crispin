@@ -50,7 +50,7 @@ such as integer, keyword, vector, etc.
 
 == Usage
 
-In Lein, `[crispin "0.3.4"]`
+In Lein, `[crispin "0.3.7"]`
 
 Available functions:
 
@@ -67,7 +67,7 @@ Utility functions:
 
 == License
 
-Copyright © 2015, 2019, Jozef Wagner.
+Copyright © 2015, 2019, 2021, Jozef Wagner.
 
 The use and distribution terms for this software are covered by the [Eclipse Public License 1.0](http://opensource.org/licenses/eclipse-1.0.php) which can be found in the file epl-v10.html at the root of this distribution.
 
