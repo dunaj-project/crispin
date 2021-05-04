@@ -227,6 +227,21 @@
   map. Used e.g. by boot to inject custom configuration."
   (atom {}))
 
+(defn load-custom-cfg!
+  "Load custom configuration in custom-cfg atom.
+
+   Call this function before calling cfg.
+   You can call this function multiple times and config will be merged.
+
+   Looks for cfg-name in current directory if not specified otherwise."
+  ([cfg-name]
+   (load-custom-cfg! (System/getProperty "user.dir") cfg-name))
+  ([cfg-dir cfg-name]
+   (let [cfg (->> (clojure.java.io/file cfg-dir cfg-name)
+                  .getCanonicalFile
+                  .toURI)]
+    (swap! custom-cfg merge-cfg (fetch-resource cfg)))))
+
 (defn cfg
   "Provides map merged from various sources, in following order:
 
@@ -353,3 +368,17 @@
    (nget-in cfg [k]))
   ([cfg k default]
    (nget-in cfg [k] default)))
+
+
+(comment
+
+  (do
+    (reset! custom-cfg {})
+    (println @custom-cfg)
+    (load-custom-cfg! "config.edn")
+    (println @custom-cfg)
+    (load-custom-cfg! "config.json")
+
+    @custom-cfg)
+
+  0)
