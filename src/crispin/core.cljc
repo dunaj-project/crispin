@@ -132,7 +132,8 @@
            :clj (load-string s)))
        (catch java.nio.file.NoSuchFileException e nil)
        (catch java.io.FileNotFoundException e nil)
-       (catch java.lang.NullPointerException e nil)))))
+       ;; NPE class will be added in bb 0.3.8
+       #?@(:bb [] :clj [(catch java.lang.NullPointerException e nil)])))))
 
 (defn fetch-cp-entry
   [^java.io.File entry ^java.nio.file.Path ppath]
@@ -214,9 +215,10 @@
 (defprotocol IResource
   (-get-uri [this]))
 
-(deftype Resource [uri]
-  IResource
-  (-get-uri [this] uri))
+(#?(:bb defrecord :clj deftype)
+ Resource [uri]
+ IResource
+ (-get-uri [this] uri))
 
 
 

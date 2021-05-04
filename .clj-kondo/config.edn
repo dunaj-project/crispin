@@ -1,0 +1,2 @@
+{;; don't lint for CLJS since we use .cljc for babashka reader conditionals
+ :cljc {:features #{:clj}}}
